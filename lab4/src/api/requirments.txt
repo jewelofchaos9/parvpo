@@ -1,0 +1,4 @@
+flask==3.0.3
+rq==1.16.1
+redis==5.0.4
+logfmt-logger==0.1.2

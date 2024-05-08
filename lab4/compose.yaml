@@ -1,0 +1,49 @@
+services:
+  redis:
+    image: redis:7.2.4-alpine
+    volumes:
+      - ./vol/redis:/data
+    ports:
+      - 6379:6379
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-1234}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+
+  api:
+    build: ./src/api
+    ports:
+      - 1337:1337
+
+  worker:
+    build: ./src/worker
+
+
+  grafana:
+    image: grafana/grafana-oss:9.5.10
+    user: ":"
+    volumes:
+      - ./volumes/grafana:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+      - ./config/grafana/dashboards:/dashboards
+    restart: unless-stopped
+    cpus: 1
+    mem_limit: 4gb
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-parvpo}
+      GF_AUTH_ANONYMOUS_ENABLED: false
+    ports:
+      - "3001:3000"
+
+  loki:
+    container_name: loki
+    user: ":"
+    image: grafana/loki:2.9.1
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/local-config.yaml
+    volumes: 
+      - ./volumes/loki/etc:/etc/loki/
+      - ./config/loki/local-config.yaml:/etc/local-config.yaml
+    deploy:
+      restart_policy:
+        condition: always
