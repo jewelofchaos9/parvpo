@@ -73,6 +73,10 @@ def add_flag_endpoint():
 
     return {"msg": "success"}
 
+@app.route('/api/queue_length', methods=["GET"])
+def length_of_queue():
+    return {"msg": len(queue)}
+
 
 if __name__ == "__main__":
     app.run('0.0.0.0', port=1337)

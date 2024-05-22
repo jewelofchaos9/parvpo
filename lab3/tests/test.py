@@ -11,8 +11,9 @@ API_URL = os.getenv('API_URL', 'http://0.0.0.0:1337/api')
 TEAMS = []
 FLAGS = []
 TASKS = []
-TRIES = 50
-THREADS = 2
+TASKS_LENGTH = []
+TRIES = 500
+THREADS = 3
 
 
 def random_string(length=15):
@@ -60,11 +61,26 @@ def loader():
     for i in tqdm(range(TRIES)):
         random_submit()
 
+def scrumber():
+    for i in tqdm(range(TRIES)):
+        random_submit()
+        num_of_tasks = requests.get(f"{API_URL}/queue_length").json()['msg']
+        TASKS_LENGTH.append([time.time(), num_of_tasks])
+
+
+def kek():
+    num_of_tasks = 1
+    while num_of_tasks != 0:
+        num_of_tasks = requests.get(f"{API_URL}/queue_length").json()['msg']
+        TASKS_LENGTH.append([time.time(), num_of_tasks])
+        print(TASKS_LENGTH)
+        time.sleep(0.2)
 
 def high_load():
     pool = ThreadPoolExecutor(max_workers=THREADS)
-    for _ in range(THREADS):
+    for _ in range(THREADS - 1):
         pool.submit(loader)
+    pool.submit(scrumber)
     pool.shutdown(wait=True)
 
 
@@ -73,7 +89,9 @@ def test():
     high_load()
     task_id = TASKS[-1]
     time.sleep(3)
-    print(requests.get(f"{API_URL}/results/{task_id}").text)
+    requests.get(f"{API_URL}/results/{task_id}").text
+    kek()
+    print(TASKS_LENGTH)
 
 if __name__ == "__main__":
     test()

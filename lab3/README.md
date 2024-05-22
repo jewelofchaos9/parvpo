@@ -22,5 +22,9 @@ flask, rq, redis
 
 ![BigLoad](./images/test_really_big_highload.png)
 
+Количество жоб во времени
+
+![TimePerJob](./images/load_per_time.png)
+
 ## Заключение
 В результате лабораторной работы были опробованы механизмы брокера и синхронной очереди.
