@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 API_URL = os.getenv('API_URL', 'http://0.0.0.0:3232/api')
 THREADS = 1
-TRIES = 100
+TRIES = 200
 IPS = []
 with open('./ips.txt', 'r') as f:
     for line in f.readlines():

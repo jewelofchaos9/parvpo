@@ -1,15 +1,9 @@
-import requests
-import redis
-import os
-import json
-from flask import Flask, request
+## Никифоров Степан Б21-505 ПАРВПО Лабораторная работа N5 2024
 
-app = Flask(__name__)
-conn = redis.Redis(
-    host='redis',
-    port=int(os.getenv('REDIS_PORT', '6379'))
-)
+## Реализуемая система
+Виджет из примера. По айпишнику выдается температура и курс доллара к данной валюте
 
+```py
 def get_info(ip):
     """Хак для того чтобы хоть как то аггрегировать айпишники
     последний октет наверняка будет принадлежать одному провайдеру, поэтому просто кэшируем первые три байта айпишника, считаем что все норм"""
@@ -28,25 +22,22 @@ def get_info(ip):
     ans = {'weather': temp, 'usd price': currency_rate}
     conn.set(masked_ip, json.dumps(ans), ex=60*60)
     return ans
+```
 
+Обращения на API довольно тяжеловесные, поэтому применяется кэш, который хранится в течение 60 минут
 
-@app.route('/api/get_bar')
-def get_bar():
-    # let assume that remote_addr is literally remote
-    ip = request.args.get(
-        'ip',
-        request.remote_addr
-    )
-    return get_info(ip)
+## Используемые технологии
+flask, redis
 
-def cache_warmer():
-    with open('./ips.txt', 'r') as f:
-        for l in f.readlines():
-            try:
-                get_info(l.strip())
-            except:
-                continue
+## Результаты
+Для тестовой нагрузки был сгенерирован пул из 50 валидных IP адресов. 
 
-if __name__ == "__main__":
-    cache_warmer()
-    app.run('0.0.0.0', 3232)
+Проводилось 200 запросов с случайным выбранным IP из этого пула.
+### Без кэша
+![Without cache](./images/without_cache.png)
+
+### С кэшем без прогрева
+![Cache](./images/with_cache.png)
+
+### С кэшем и прогревом кэша
+![Warmed up](./images/with_cache_warming.png)

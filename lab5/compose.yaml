@@ -1,0 +1,15 @@
+services:
+  redis:
+    image: redis:7.2.4-alpine
+    volumes:
+      - ./vol/redis:/data
+    ports:
+      - 6379:6379
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-1234}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+
+  api:
+    build: ./src
+    ports:
+      - 3232:3232
